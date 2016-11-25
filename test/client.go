@@ -1,0 +1,54 @@
+package main
+
+import (
+    "../proto"
+    "fmt"
+    "net"
+    "os"
+    "time"
+    "strconv"
+	"encoding/json"
+)
+
+func send(conn net.Conn) {
+    session := GetSession()
+    for i := 0; i < 100; i++ {
+    //    session := GetSession()
+        //words := "{\"ID\":"+ strconv.Itoa(i) +"\",\"Session\":"+session +"2015073109532345\",\"Meta\":\"golang\",\"Content\":\"message\"}"
+		body := make(map[string]interface{})
+		body["ID"] = strconv.Itoa(i)
+		body["session"] = session
+		data, _ := json.Marshal(body)
+        conn.Write(proto.Enpack([]byte(data)))
+        time.Sleep(1*time.Second)
+    }
+    fmt.Println("send over")
+    defer conn.Close()
+}
+
+func GetSession() string{
+    gs1:=time.Now().Unix()
+    gs2:=strconv.FormatInt(gs1,10)
+    return gs2
+}
+
+func main() {
+    server := "localhost:6060"
+    tcpAddr, err := net.ResolveTCPAddr("tcp4", server)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
+        os.Exit(1)
+    }
+
+    conn, err := net.DialTCP("tcp", nil, tcpAddr)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
+        os.Exit(1)
+    }
+
+    fmt.Println("connect success")
+	for {
+		fmt.Scanf	
+	}
+    send(conn)
+}
